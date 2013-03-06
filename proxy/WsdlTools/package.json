@@ -1,0 +1,23 @@
+{
+  "author": "Mike Schilling <mike@emotive.com>",
+  "name": "emwsdlSupport",
+  "description": "WSDL support",
+  "version": "1.0.0",
+  "homepage": "http://www.emotive.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emote/emwsdlSupport"
+  },
+  "dependencies": {
+      "emsoap": "~1.0.10",
+      "emutils": "~1.0.9",
+      "emproxy": "~1.0.9"
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {},
+  "license" : "MIT/X11",
+  "engines": {
+    "node": ">=0.8.3"
+  }
+}

@@ -1,0 +1,100 @@
+[
+    {
+        "op": "INVOKE",
+        "targetType": "CdmExternalSystem",
+        "name": "createExternalSystem",
+        "params": {
+            "name": "WsdlTools"
+        }
+    },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "replaceCdmType",
+        "params": {
+            "typeName": "WsdlTools",
+            "storage": "virtual",
+            "extensionAllowed": true,
+            "externallySourced": true,
+            "propertySet": []
+        }
+    },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "bindCdmType",
+        "params": {
+            "typeName": "WsdlTools",
+            "externalType": "WsdlTools",
+            "externalSystem": "WsdlTools",
+            "readStrategy": "sync",
+            "cacheMode": "direct",
+            "sourceStrategy": "sync",
+            "uniqueExternalId": true,
+            "externalIdProperty": "id",
+            "bindingStrategy": "matchPropertyNames"
+        }
+    },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "createCdmOperation",
+        "params": {
+            "name": "getWsdlCollection",
+            "targetType": "WsdlTools",
+            "returnType": "String",
+            "externalSystem": "WsdlTools",
+            "parameters": [
+                {
+                    "name": "wsdlUrl",
+                    "typeName": "String",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
+                    "name": "username",
+                    "typeName": "String",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
+                    "name": "password",
+                    "typeName": "String",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                }
+            ]
+        }
+    },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "createCdmOperation",
+        "params": {
+            "name": "createWsdlModel",
+            "targetType": "WsdlTools",
+            "returnType": "Object",
+            "externalSystem": "WsdlTools",
+            "parameters": [
+                {
+                    "name": "wsdl",
+                    "typeName": "Object",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
+                    "name": "opDefs",
+                    "typeName": "Object",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
+                    "name": "serviceName",
+                    "typeName": "String",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                }
+            ]
+        }
+    }
+]
