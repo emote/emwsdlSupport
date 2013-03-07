@@ -89,6 +89,12 @@
                     "cardinality": "one"
                 },
                 {
+                    "name": "proxyConfig",
+                    "typeName": "Object",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
                     "name": "serviceName",
                     "typeName": "String",
                     "targetType": "CdmParameter",

@@ -6,6 +6,14 @@ var emutils = require('emutils');
 
 var wsdlcollection = emsoap.subsystems.wsdlcollection;
 
+var cdmTypes =
+{
+    string: "String",
+    number : "Real",
+    boolean : "Boolean",
+    date : "Date"
+};
+
 emproxy.init(function afterInitCallback(initialConfig) {
     console.dir(initialConfig);
     emproxy.start(processDirective);
@@ -80,8 +88,8 @@ function createWsdlModel(params, cb) {
                 if (op.input) {
                     simplifyRequestParams(wsdl, op.input);
                     var isEncoded = op.input.use == "ENCODED";
-                    var params = op.input.params ? op.input.params : op.input.parts;
-                    params.forEach(function(part) {
+                    var inputParams = op.input.params ? op.input.params : op.input.parts;
+                    inputParams.forEach(function(part) {
                         processPart(wsdl, part, "in", inputParts, allModelTypes, otherTypes, isEncoded);
                     });
                 }
@@ -320,14 +328,6 @@ function createWsdlModel(params, cb) {
     function shouldIgnoreType(ns) {
         return !ns || ns == XSD_NS;
     }
-
-    var cdmTypes =
-    {
-        string: "String",
-        number : "Real",
-        boolean : "Boolean",
-        date : "Date"
-    };
 
     function getCdmType(jsonType) {
         var ctype = cdmTypes[jsonType];
