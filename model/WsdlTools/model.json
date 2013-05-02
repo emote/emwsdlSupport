@@ -4,7 +4,8 @@
         "targetType": "CdmExternalSystem",
         "name": "createExternalSystem",
         "params": {
-            "name": "WsdlTools"
+            "name": "WsdlTools",
+            "globalPackageName" : "wsdlTools"
         }
     },
     {
