@@ -103,5 +103,31 @@
                 }
             ]
         }
+    },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "createCdmOperation",
+        "params": {
+            "name": "createModelRestRequests",
+            "targetType": "WsdlTools",
+            "returnType": "Object",
+            "externalSystem": "WsdlTools",
+            "parameters": [
+                {
+                    "name": "model",
+                    "typeName": "Object",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one"
+                },
+                {
+                    "name": "createExternalSystem",
+                    "typeName": "Boolean",
+                    "targetType": "CdmParameter",
+                    "cardinality": "one",
+                    "isOptional" : true
+                }
+            ]
+        }
     }
 ]

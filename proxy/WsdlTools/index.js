@@ -32,6 +32,11 @@ function processDirective(restRequest,callback) {
                 found = true;
                 createWsdlModel(restRequest.params, callback);
                 break;
+
+            case "createModelRestRequests":
+                found = true;
+                createModelRestRequests(restRequest.params, callback);
+                break;
         }
     }
 
@@ -633,4 +638,157 @@ function createWsdlModel(params, cb) {
 
 
 }
+
+function createModelRestRequests(params, cb) {
+    var restRequests = [];
+    var model = params.model;
+    if (params.createExternalSystem) {
+        createExternalSystem(restRequests, model.accessAddress, 
+            model.proxyConfig, model.name);
+    }
+    model.types.forEach(function(type) {
+        if (type.isEnum) {
+            createType(restRequests, type.name, null, false, null, type.values, type.baseType);
+        }
+        else {
+            createType(restRequests, type.name, type.properties, type.isEmbedded, 
+                model.name + "_ServiceType");
+            bindType(restRequests, type.name, model.name);
+            type.operations.forEach(function(op) {
+                addOperation(restRequests, type.name, op.name, model.name, 
+                    op.returnType, op.parameters);
+            });
+        }
+    });
+
+    var restResponse = {
+        status:"SUCCESS",
+        count: restRequests.count,
+        results: restRequests
+    }
+    cb(null, restResponse);
+
+    function createExternalSystem(model, wsdlSoapAddress, proxyConfig, name) {
+        var params = { name: name, globalPackageName : "wsdlProxy" };
+        var endpoint = null;
+        if (proxyConfig && proxyConfig.soapAddress) {
+            endpoint = proxyConfig.soapAddress;
+        }
+        else if (wsdlSoapAddress) {
+            endpoint = wsdlSoapAddress;
+        }
+        if (endpoint) {
+            params.accessAddress = endpoint;
+        }
+        var pConfig = {};
+
+        if (proxyConfig) {
+            for (var name in proxyConfig) {
+                var value = proxyConfig[name];
+                if (value != null && value != undefined) {
+                    pConfig[name] = value;
+                }
+            }
+        }
+        params.proxyConfiguration = pConfig;
+
+        model.push(
+            {
+                "op": "INVOKE",
+                "targetType": "CdmExternalSystem",
+                "name": "createExternalSystem",
+                "params": params
+            }
+        )
+    }
+
+    function createType(model, name, props, isEmbedded, svcType, enumeratedValues, enumType) {
+        var params;
+        var propsCopy = emutils.cloneArray(props);
+        propsCopy.forEach(function(row) {
+            if (emutils.isReservedPropertyName(row.name)) {
+                row.name = emutils.getCdmPropertyName(row.name);
+            }
+        });
+        if (enumeratedValues) {
+            var values = [];
+            enumeratedValues.forEach(function(val) {
+                values.push({"targetType" : "CdmEnumeration", "value":val, "label" : val});
+            });
+            params = {
+                "typeName": name,
+                "storage": "scalar",
+                "scalarBaseType": getCdmType(enumType),
+                "scalarInheritsFrom": getCdmType(enumType),
+                "isEnumerated" : true,
+                "isScalar" : true,
+                "extensionAllowed": true,
+                "externallySourced": true,
+                "propertySet": propsCopy,
+                "enumeration" : values
+            };
+        }
+        else {
+            params = {
+                "typeName": name,
+                "storage": (isEmbedded ? "embedded" : "virtual"),
+                "baseTable": (isEmbedded ? svcType : undefined),
+                "extensionAllowed": true,
+                "externallySourced": true,
+                "propertySet": props
+            };
+        }
+        params.replace = true;
+        model.push(
+            {"op": "INVOKE",
+                "targetType": "CdmSimpleSchemaOperations",
+                "name": "deleteCdmOperations",
+                "params": {typeName : name}
+            });
+        model.push(
+            {"op": "INVOKE",
+                "targetType": "CdmType",
+                "name": "alterCdmType",
+                "params": params
+            });
+    }
+
+    function bindType(model, typeName, svcName) {
+        model.push({
+            "op": "INVOKE",
+            "targetType": "CdmSimpleSchemaOperations",
+            "name": "bindCdmType",
+            "params": {
+                "cdmType": typeName,
+                "targetType": typeName,
+                "externalSystem": svcName,
+                "bindingProps": {
+                    "readStrategy": "sync",
+                    "cacheMode": "direct",
+                    "sourceStrategy": "sync",
+                    "uniqueExternalId": true
+                }
+            }
+        });
+    }
+
+    function addOperation(model, typeName, opName, svcName, rtnType, params) {
+        model.push({
+            "op": "INVOKE",
+            "targetType": "CdmSimpleSchemaOperations",
+            "name": "createAndBindCdmOperation",
+            "params": {
+                "targetType": typeName,
+                "operationProps": {
+                    "name" : opName,
+                    "objectType" : typeName,
+                    "returnType": rtnType,
+                    "parameters": params
+                }
+            }
+        });
+    }
+        
+}
+
 
