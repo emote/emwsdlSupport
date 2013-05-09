@@ -646,6 +646,10 @@ function createModelRestRequests(params, cb) {
         createExternalSystem(restRequests, model.accessAddress, 
             model.proxyConfig, model.name);
     }
+    else {
+        updateExternalSystem(restRequests, model.proxyConfig);
+    }
+
     model.types.forEach(function(type) {
         if (type.isEnum) {
             createType(restRequests, type.name, null, false, null, type.values, type.baseType);
@@ -667,6 +671,32 @@ function createModelRestRequests(params, cb) {
         results: restRequests
     }
     cb(null, restResponse);
+
+    function updateExternalSystem(model, proxyConfig) {
+        var params = {};
+        var pConfig = {};
+
+        if (proxyConfig) {
+            for (var name in proxyConfig) {
+                var value = proxyConfig[name];
+                if (value != null && value != undefined) {
+                    pConfig[name] = value;
+                }
+            }
+        }
+        params.proxyConfiguration = pConfig;
+        model.push(
+            {
+                "op": "UPDATE",
+                "targetType": "CdmExternalSystem",
+                "values": params,
+                "where" :
+                {
+                    id : "999"
+                }
+            }
+        )
+    }
 
     function createExternalSystem(model, wsdlSoapAddress, proxyConfig, name) {
         var params = { name: name, globalPackageName : "wsdlProxy" };
