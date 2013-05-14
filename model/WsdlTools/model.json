@@ -10,9 +10,18 @@
     },
     {
         "op": "INVOKE",
-        "targetType": "CdmType",
-        "name": "replaceCdmType",
+        "name": "deleteCdmOperations",
         "params": {
+          "typeName": "wsdlTools"
+        },
+            "targetType": "CdmSimpleSchemaOperations"
+        },
+    {
+        "op": "INVOKE",
+        "targetType": "CdmType",
+        "name": "alterCdmType",
+        "params": {
+            "replace" : true,
             "typeName": "WsdlTools",
             "storage": "virtual",
             "extensionAllowed": true,
