@@ -14,6 +14,11 @@ var cdmTypes =
     date : "Date"
 };
 
+function getCdmType(jsonType) {
+    var ctype = cdmTypes[jsonType];
+    return ctype ? ctype : "String";
+}
+
 emproxy.init(function afterInitCallback(initialConfig) {
     console.dir(initialConfig);
     emproxy.start(processDirective);
@@ -70,7 +75,6 @@ function createWsdlModel(params, cb) {
         var svcTypeName = svcName + "_ServiceType";
 
         wsdl.typeDirectory = createTypeDirectory(wsdl);
-        var model = [];
         var types = [];
 
         var svcType = createType(svcTypeName, [], false);
@@ -84,7 +88,6 @@ function createWsdlModel(params, cb) {
         for (var opName in opDefs.operations) {
             if (opDefs.operations[opName]) {
                 numOps++;
-                var allParams = [];
                 var op = wsdl.operations[opName];
                 var inputParts =  [];
                 var outputParts = [];
@@ -240,7 +243,6 @@ function createWsdlModel(params, cb) {
     }
 
     function processPart(wsdl, part, usage, allParts, allModelTypes, otherTypes, isEncoded) {
-        var type;
 
         var desc;
         if (part.elementName) {
@@ -278,7 +280,7 @@ function createWsdlModel(params, cb) {
     }
 
     function processTypeContent(wsdl, usage, allModelTypes, otherTypes, type, props) {
-        if (type.baseTypeNs && type.baseTypeNs != SOAP_ENCODING_NS && type.baseTypeNs != XSD_NS) {
+        if (type.baseTypeNs && type.baseTypeNs != emsoap.namespaces.SOAPENC_NS && type.baseTypeNs != emsoap.namespaces.XSD_NS) {
             var baseQName = makeQualifiedName(type.baseTypeNs, type.baseTypeName);
             var baseType = wsdl.types[baseQName] ;
             otherTypes[baseQName] = {typeName: baseQName, type: baseType};
@@ -330,15 +332,6 @@ function createWsdlModel(params, cb) {
         return ns ? '{' + ns + '}' + name : name;
     }
 
-    function shouldIgnoreType(ns) {
-        return !ns || ns == XSD_NS;
-    }
-
-    function getCdmType(jsonType) {
-        var ctype = cdmTypes[jsonType];
-        return ctype ? ctype : "String";
-    }
-
     function makeJsonType(jtype) {
         return {jsonType : jtype};
     }
@@ -373,7 +366,7 @@ function createWsdlModel(params, cb) {
         }
         else {
             type = wsdl.types[makeQualifiedName(ns, local)];
-            if (type.baseTypeName == "Array" && type.baseTypeNs == SOAP_ENCODING_NS) {
+            if (type.baseTypeName == "Array" && type.baseTypeNs == emsoap.namespaces.SOAPENC_NS) {
                 isArray = true;
                 var rowDesc = type.content[0];
                 if (rowDesc.jsonType) {
@@ -393,7 +386,6 @@ function createWsdlModel(params, cb) {
     }
 
     function simplifyRequestParams(wsdl, opInput) {
-        var canSimplify = false;
         var shouldSimplify = false;
         var names = {};
         var params = [];
@@ -529,7 +521,7 @@ function createWsdlModel(params, cb) {
                 type.content.forEach(function(item, index, array) {
                     if (item.xmlTypeNs) {
                         var itemType = model.wsdl.types[makeQualifiedName(item.xmlTypeNs, item.xmlType)];
-                        if (itemType.baseTypeName == "Array" && itemType.baseTypeNs == SOAP_ENCODING_NS) {
+                        if (itemType.baseTypeName == "Array" && itemType.baseTypeNs == emsoap.nameapace.SOAPENC_NS) {
                             item.isArray = true;
                             item.isEnum = itemType.content[0].isEnum;
                             item.xmlTypeNs = itemType.content[0].xmlTypeNs;
