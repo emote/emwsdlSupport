@@ -12,7 +12,7 @@
         "op": "INVOKE",
         "name": "deleteCdmOperations",
         "params": {
-          "typeName": "wsdlTools"
+          "typeName": "WsdlTools"
         },
             "targetType": "CdmSimpleSchemaOperations"
         },
