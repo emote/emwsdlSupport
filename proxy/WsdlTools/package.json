@@ -2,7 +2,7 @@
     "author": "Mike Schilling <mike@emotive.com>",
     "name": "emwsdlSupport",
     "description": "WSDL support",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "homepage": "http://www.emotive.com",
     "repository": {
         "type": "git",
