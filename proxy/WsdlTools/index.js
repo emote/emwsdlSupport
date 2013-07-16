@@ -657,6 +657,35 @@ function createModelRestRequests(params, cb) {
         }
     });
 
+    // Sort the restRequests, to ensure things are bound after being created
+    var bindOpRequests = [];
+    var createTargetTypeRequests = [];
+    var bindTypeRequests = [];
+    var vanillaRequests = [];
+
+    restRequests.forEach(function(req) {
+        switch (req.name) {
+            case "createAndBindCdmOperation":
+                bindOpRequests.push(req);
+                break;
+            case "bindCdmType":
+                var reqTT = emutils.clone(req);
+                reqTT.params = emutils.clone(reqTT.params);
+                reqTT.params.deleteTargetDefs = true;
+                reqTT.params.createTargetType = true;
+                createTargetTypeRequests.push(reqTT);
+                var reqTB = emutils.clone(req);
+                reqTB.params = emutils.clone(reqTB.params);
+                reqTB.params.createTypeBinding = true;
+                bindTypeRequests.push(reqTB);
+                break;
+            default:
+                vanillaRequests.push(req);
+                break;
+        }
+    });
+
+    restRequests = vanillaRequests.concat(createTargetTypeRequests, bindTypeRequests, bindOpRequests);
     var restResponse = {
         status:"SUCCESS",
         count: restRequests.count,
